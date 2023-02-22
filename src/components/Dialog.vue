@@ -1,105 +1,22 @@
 <template>
   <v-dialog
-
       v-model="isOpenDialog"
       width="auto"
       @update:modelValue="toggleDialog"
   >
-    <v-card>
-      <v-card>
-        <v-card-title>
-          <span class="text-h5">User Profile</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col
-                  cols="12"
-                  sm="6"
-                  md="4"
-              >
-                <v-text-field
-                    label="Legal first name*"
-                    required
-                ></v-text-field>
-              </v-col>
-              <v-col
-                  cols="12"
-                  sm="6"
-                  md="4"
-              >
-                <v-text-field
-                    label="Legal middle name"
-                    hint="example of helper text only on focus"
-                ></v-text-field>
-              </v-col>
-              <v-col
-                  cols="12"
-                  sm="6"
-                  md="4"
-              >
-                <v-text-field
-                    label="Legal last name*"
-                    hint="example of persistent helper text"
-                    persistent-hint
-                    required
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                    label="Email*"
-                    required
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                    label="Password*"
-                    type="password"
-                    required
-                ></v-text-field>
-              </v-col>
-              <v-col
-                  cols="12"
-                  sm="6"
-              >
-                <v-select
-                    :items="['0-17', '18-29', '30-54', '54+']"
-                    label="Age*"
-                    required
-                ></v-select>
-              </v-col>
-              <v-col
-                  cols="12"
-                  sm="6"
-              >
-                <v-autocomplete
-                    :items="['Skiing', 'Ice hockey', 'Soccer', 'Basketball', 'Hockey', 'Reading', 'Writing', 'Coding', 'Basejump']"
-                    label="Interests"
-                    multiple
-                ></v-autocomplete>
-              </v-col>
-            </v-row>
-          </v-container>
-          <small>*indicates required field</small>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-              color="blue-darken-1"
-              variant="text"
-              @click="dialog = false"
-          >
-            Close
-          </v-btn>
-          <v-btn
-              color="blue-darken-1"
-              variant="text"
-              @click="dialog = false"
-          >
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+    <v-card :class="dialogVariant" min-width="600">
+      <v-card-title v-if="title">
+        <span class="text-h5">{{ title }}</span>
+      </v-card-title>
+      <v-card-text v-if="$slots.content">
+        <v-container>
+          <slot name="content"></slot>
+        </v-container>
+      </v-card-text>
+      <v-card-actions v-if="$slots.actions">
+        <v-spacer></v-spacer>
+        <slot name="actions"></slot>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
@@ -109,12 +26,28 @@ export default {
   name: "Dialog",
   emits: ['toggle'],
   props: {
+    variant: {
+      type: String,
+      default: 'default'
+    },
+    title: {
+      type: [String, null],
+      default: null,
+    },
     isOpen: {
       type: Boolean,
       default: false,
     }
   },
   computed: {
+    dialogVariant() {
+      switch (this.variant) {
+        case 'error':
+          return 'bg-red-darken-4';
+        default:
+          return 'bg-grey-lighten-4';
+      }
+    },
     isOpenDialog() {
       return this.isOpen
     }

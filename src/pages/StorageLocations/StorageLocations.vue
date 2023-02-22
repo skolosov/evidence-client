@@ -26,7 +26,7 @@
               size="small"
               icon="mdi-text-box-edit-outline"
               color="success"
-              @click="toggleDialog"
+              @click="toggleDialogEdit"
           />
         </td>
         <td class="text-center">
@@ -35,24 +35,49 @@
               size="small"
               icon="mdi-delete"
               color="error"
+              @click="toggleDialogDelete"
           />
         </td>
       </tr>
       </tbody>
     </v-table>
-    <dialog-component :is-open="isOpenDialog" @toggle="toggleDialog" />
+    <dialog-component
+        title="Изменение места хранения"
+        :is-open="isOpenDialogEdit"
+        @toggle="toggleDialogEdit"
+    >
+      <template v-slot:content>
+          <storage-locations-form />
+      </template>
+    </dialog-component>
+    <dialog-component
+        title="Удалить место хранения"
+        :is-open="isOpenDialogDelete"
+        variant="error"
+        @toggle="toggleDialogDelete"
+    >
+      <template v-slot:content>
+        <span>Вы точно хотите место хранения?</span>
+      </template>
+      <template v-slot:actions>
+        <v-btn variant="elevated" color="error">Удалить</v-btn>
+        <v-btn variant="elevated" @click="toggleDialogDelete">Отмена</v-btn>
+      </template>
+    </dialog-component>
   </v-sheet>
 </template>
 
 <script>
 import DialogComponent from "../../components/Dialog.vue";
+import StorageLocationsForm from "./StorageLocationsForm.vue";
 
 export default {
   name: "StorageLocations",
-  components: {DialogComponent},
+  components: {StorageLocationsForm, DialogComponent},
   data() {
     return {
-      isOpenDialog: false,
+      isOpenDialogEdit: false,
+      isOpenDialogDelete: false,
       columns: [
         '№ п\\п',
         'Наименование',
@@ -105,8 +130,11 @@ export default {
     }
   },
   methods: {
-    toggleDialog() {
-      this.isOpenDialog = !this.isOpenDialog;
+    toggleDialogEdit() {
+      this.isOpenDialogEdit = !this.isOpenDialogEdit;
+    },
+    toggleDialogDelete() {
+      this.isOpenDialogDelete = !this.isOpenDialogDelete;
     }
   }
 }
