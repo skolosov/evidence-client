@@ -10,23 +10,13 @@
 
     <v-select
         v-model="division"
-        :items="items"
+        :items="divisionsOptions"
         item-title="name"
-        item-value="value"
+        item-value="id"
         label="Подразделение"
         :rules="[rules.required]"
         variant="outlined"
     ></v-select>
-<!--    <v-text-field-->
-<!--        class="mb-2"-->
-<!--        variant="outlined"-->
-<!--        v-model="password"-->
-<!--        :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"-->
-<!--        :rules="[rules.required, rules.min]"-->
-<!--        :type="showPassword ? 'text' : 'password'"-->
-<!--        label="Пароль"-->
-<!--        @click:append="showPassword = !showPassword"-->
-<!--    ></v-text-field>-->
 
     <v-btn type="submit" block class="mt-2">Войти</v-btn>
   </v-form>
@@ -34,18 +24,28 @@
 
 <script>
 import rules from "../../formsRules";
+import {mapGetters} from 'vuex';
 
 export default {
   name: "StorageLocationsForm",
+  props: {
+    active: {
+      type: Object,
+      default: {},
+    }
+  },
   data: () => ({
     storage: '',
     division: null,
-    items: [
-      {name: 'ГУ МВД', value: 1},
-      {name: 'Володарский', value: '2'}
-    ],
     rules,
   }),
+  mounted() {
+    this.storage = this.active?.name || '';
+    this.division = this.active?.id || null;
+  },
+  computed: {
+    ...mapGetters(['divisionsOptions'])
+  },
   methods: {
     async submit(event) {
       const results = await event

@@ -14,19 +14,19 @@
       </thead>
       <tbody>
       <tr
-          v-for="item in desserts"
-          :key="item.name"
+          v-for="item in storageLocationsRows"
+          :key="item.id"
       >
+        <td>{{ item.id }}</td>
         <td>{{ item.name }}</td>
-        <td>{{ item.calories }}</td>
-        <td>{{ item.calories }}</td>
+        <td></td>
         <td class="text-center">
           <v-btn
               variant="outlined"
               size="small"
               icon="mdi-text-box-edit-outline"
               color="success"
-              @click="toggleDialogEdit"
+              @click="toggleDialogEdit(item)"
           />
         </td>
         <td class="text-center">
@@ -47,7 +47,7 @@
         @toggle="toggleDialogEdit"
     >
       <template v-slot:content>
-          <storage-locations-form />
+        <storage-locations-form :active="activeRow"/>
       </template>
     </dialog-component>
     <dialog-component
@@ -70,6 +70,7 @@
 <script>
 import DialogComponent from "../../components/Dialog.vue";
 import StorageLocationsForm from "./StorageLocationsForm.vue";
+import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: "StorageLocations",
@@ -78,6 +79,7 @@ export default {
     return {
       isOpenDialogEdit: false,
       isOpenDialogDelete: false,
+      activeRow: {},
       columns: [
         '№ п\\п',
         'Наименование',
@@ -85,52 +87,19 @@ export default {
         'Редактировать',
         'Удалить'
       ],
-      desserts: [
-        {
-          name: 'Frozen Yogurt',
-          calories: 159,
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-        },
-        {
-          name: 'Cupcake',
-          calories: 305,
-        },
-        {
-          name: 'Gingerbread',
-          calories: 356,
-        },
-        {
-          name: 'Jelly bean',
-          calories: 375,
-        },
-        {
-          name: 'Lollipop',
-          calories: 392,
-        },
-        {
-          name: 'Honeycomb',
-          calories: 408,
-        },
-        {
-          name: 'Donut',
-          calories: 452,
-        },
-        {
-          name: 'KitKat',
-          calories: 518,
-        },
-      ],
     }
   },
+  computed: {
+    ...mapGetters(['storageLocationsRows']),
+  },
+  mounted() {
+    this.getStorageLocationsData();
+    this.getDivisionsData();
+  },
   methods: {
-    toggleDialogEdit() {
+    ...mapActions(['getStorageLocationsData', 'getDivisionsData']),
+    toggleDialogEdit(active) {
+      this.activeRow = active;
       this.isOpenDialogEdit = !this.isOpenDialogEdit;
     },
     toggleDialogDelete() {

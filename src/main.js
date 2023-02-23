@@ -21,7 +21,8 @@ import StorageLocations from "./pages/StorageLocations/StorageLocations.vue";
 import Evidences from "./pages/Evidences/Evidences.vue";
 import Login from "./pages/Login/Login.vue";
 import Registration from "./pages/Registration/Registration.vue";
-import VueTheMask from 'vue-the-mask'
+import VueTheMask from 'vue-the-mask';
+import state from "./store/store";
 
 
 const routes = [
@@ -36,18 +37,7 @@ const router = createRouter({
     routes,
 });
 
-const store = createStore({
-    state () {
-        return {
-            count: 0
-        }
-    },
-    mutations: {
-        increment (state) {
-            state.count++
-        }
-    }
-});
+const store = createStore(state);
 const app = createApp(App);
 
 app.use(store);
