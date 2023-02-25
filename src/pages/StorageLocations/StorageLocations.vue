@@ -13,32 +13,37 @@
       </tr>
       </thead>
       <tbody>
-      <tr
-          v-for="item in storageLocationsRows"
-          :key="item.id"
-      >
-        <td>{{ item.id }}</td>
-        <td>{{ item.name }}</td>
-        <td></td>
-        <td class="text-center">
-          <v-btn
-              variant="outlined"
-              size="small"
-              icon="mdi-text-box-edit-outline"
-              color="success"
-              @click="toggleDialogEdit(item)"
-          />
-        </td>
-        <td class="text-center">
-          <v-btn
-              variant="outlined"
-              size="small"
-              icon="mdi-delete"
-              color="error"
-              @click="toggleDialogDelete"
-          />
-        </td>
-      </tr>
+      <template v-if="loaded">
+        <loader-component></loader-component>
+      </template>
+      <template v-else>
+        <tr
+            v-for="item in storageLocationsRows"
+            :key="item.id"
+        >
+          <td>{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td></td>
+          <td class="text-center">
+            <v-btn
+                variant="outlined"
+                size="small"
+                icon="mdi-text-box-edit-outline"
+                color="success"
+                @click="toggleDialogEdit(item)"
+            />
+          </td>
+          <td class="text-center">
+            <v-btn
+                variant="outlined"
+                size="small"
+                icon="mdi-delete"
+                color="error"
+                @click="toggleDialogDelete"
+            />
+          </td>
+        </tr>
+      </template>
       </tbody>
     </v-table>
     <dialog-component
@@ -71,10 +76,11 @@
 import DialogComponent from "../../components/Dialog.vue";
 import StorageLocationsForm from "./StorageLocationsForm.vue";
 import {mapActions, mapGetters} from 'vuex';
+import LoaderComponent from "../../components/Loader.vue";
 
 export default {
   name: "StorageLocations",
-  components: {StorageLocationsForm, DialogComponent},
+  components: {LoaderComponent, StorageLocationsForm, DialogComponent},
   data() {
     return {
       isOpenDialogEdit: false,
@@ -90,11 +96,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['storageLocationsRows']),
+    ...mapGetters(['storageLocationsRows', 'loaded']),
   },
   mounted() {
+    this.$store.commit('setLoaded');
     this.getStorageLocationsData();
     this.getDivisionsData();
+    this.$store.commit('setLoaded');
   },
   methods: {
     ...mapActions(['getStorageLocationsData', 'getDivisionsData']),
