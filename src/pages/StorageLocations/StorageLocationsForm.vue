@@ -18,7 +18,8 @@
         variant="outlined"
     ></v-select>
 
-    <v-btn type="submit" block class="mt-2">Войти</v-btn>
+    <v-btn type="submit" block class="mt-2">{{ labelButton }}</v-btn>
+    <v-btn type="button" color="secondary" block class="mt-2" @click="closeForm">Закрыть</v-btn>
   </v-form>
 </template>
 
@@ -31,7 +32,7 @@ export default {
   props: {
     active: {
       type: Object,
-      default: {},
+      default: null,
     }
   },
   data: () => ({
@@ -41,15 +42,27 @@ export default {
   }),
   mounted() {
     this.storage = this.active?.name || '';
-    this.division = this.active?.id || null;
+    this.division = this.active?.division_id || null;
   },
   computed: {
-    ...mapGetters(['divisionsOptions'])
+    ...mapGetters(['divisionsOptions']),
+    labelButton() {
+      return this.active ? 'Обновить' : 'Создать';
+    },
   },
   methods: {
     async submit(event) {
       const results = await event
-      console.log(results);
+      const {valid} = results;
+      if (valid) {
+        this.$emit('form-sub', {
+          name: this.storage,
+          division_id: this.division,
+        });
+      }
+    },
+    closeForm() {
+      this.$emit('close');
     }
   }
 }

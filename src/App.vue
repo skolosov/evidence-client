@@ -1,7 +1,8 @@
 <template>
   <v-app>
-    <header-component />
+    <header-component/>
     <v-main style="height: 100vh">
+      <loader-component/>
       <router-view></router-view>
     </v-main>
   </v-app>
@@ -9,10 +10,11 @@
 
 <script>
 import HeaderComponent from "./components/Header.vue";
+import LoaderComponent from "./components/Loader.vue";
 
 export default {
   name: 'App',
-  components: {HeaderComponent},
+  components: {LoaderComponent, HeaderComponent},
   data: () => ({
     drawer: false,
     group: null,

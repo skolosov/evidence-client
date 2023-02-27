@@ -3,16 +3,16 @@ import login from './login';
 
 export default {
     state: () => ({
-        loaded: false,
+        loaded: false
     }),
     getters: {
-        loaded: (state) => state.loaded,
+        loaded(state) {
+            return state.loaded;
+        }
     },
     mutations: {
-        setLoaded: (state, payload) => {
-            state.loaded = payload !== null
-                ? payload
-                : state.loaded;
+        setLoaded(state, payload) {
+            state.loaded = payload;
         }
     },
     modules: {
