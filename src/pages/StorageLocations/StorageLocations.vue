@@ -9,7 +9,11 @@
       </v-btn>
     </template>
     <template v-slot:table>
+      <v-alert v-if="!storageLocationsRows.length" class="text-black">
+        <span>Нет данных</span>
+      </v-alert>
       <v-table
+          v-else
           ref="tt"
           class="v-table--density-comfortable border"
           hover
