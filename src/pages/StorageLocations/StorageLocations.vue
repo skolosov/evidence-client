@@ -1,4 +1,5 @@
 <template>
+  <v-btn variant="elevated" @click="huy">zahuy</v-btn>
   <v-sheet width="1200" class="mx-auto pa-8">
     <v-table
         hover
@@ -47,7 +48,7 @@
         @toggle="toggleDialogEdit"
     >
       <template v-slot:content>
-          <storage-locations-form />
+        <storage-locations-form/>
       </template>
     </dialog-component>
     <dialog-component
@@ -86,7 +87,7 @@ export default {
         'Удалить'
       ],
       desserts: [
-        {
+       {
           name: 'Frozen Yogurt',
           calories: 159,
         },
@@ -129,12 +130,25 @@ export default {
       ],
     }
   },
+  mounted() {
+    console.log(this.desserts);
+    // this.huy();
+    console.log(this.desserts);
+  },
+
   methods: {
     toggleDialogEdit() {
       this.isOpenDialogEdit = !this.isOpenDialogEdit;
     },
     toggleDialogDelete() {
       this.isOpenDialogDelete = !this.isOpenDialogDelete;
+    },
+    huy() {
+      this.desserts = this.desserts.map((item) => {
+        item.name = 'pp';
+        return item;
+      })
+
     }
   }
 }
