@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <header-component/>
-    <v-main style="height: 100vh">
+    <v-main style="height: 100vh" class="bg-grey-lighten-3">
       <loader-component/>
       <router-view></router-view>
     </v-main>

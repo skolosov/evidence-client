@@ -1,5 +1,5 @@
 <template>
-  <v-sheet width="600" class="mx-auto pa-8">
+  <v-card width="800" class="pa-8 mx-auto ma-4">
     <v-form fast-fail @submit.prevent="submit">
       <v-text-field
           class="mb-2"
@@ -22,11 +22,12 @@
 
       <v-btn type="submit" block class="mt-2">Войти</v-btn>
     </v-form>
-  </v-sheet>
+  </v-card>
 </template>
 
 <script>
 import rules from '../../formsRules';
+import {mapActions} from 'vuex';
 
 export default {
   name: "Login",
@@ -37,9 +38,12 @@ export default {
     rules,
   }),
   methods: {
+    ...mapActions(['loginUser']),
     async submit(event) {
-      const results = await event
-      console.log(results);
+      const results = await event;
+      if (results.valid) {
+        this.loginUser({email: this.email, password: this.password});
+      }
     }
   }
 }
