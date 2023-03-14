@@ -3,23 +3,16 @@ import {getError} from "../helpers";
 
 export default {
     state: () => ({
-        storageLocations: [],
-        divisions: [],
+        evidences: [],
     }),
     getters: {
-        storageLocationsRows(state) {
-            return state.storageLocations;
-        },
-        divisionsOptions(state) {
-            return state.divisions;
+        evidenceRows(state) {
+            return state.evidences;
         },
     },
     mutations: {
-        setStorageLocations(state, payload) {
-            state.storageLocations = payload;
-        },
-        setDivisions(state, payload) {
-            state.divisions = payload;
+        setEvidences(state, payload) {
+            state.evidences = payload ? payload : [];
         },
         addDataRow(state, {dataKey, row}) {
             const data = state[dataKey];
@@ -44,55 +37,48 @@ export default {
         }
     },
     actions: {
-        async getStorageLocationsData(context) {
+        async getEvidencesData(context, props) {
             try {
+                console.log(props);
                 context.commit('setLoaded', true);
-                const {data} = await apiGet('storage-locations');
-                context.commit('setStorageLocations', data);
+                const {data} = await apiGet('evidences', {filter: {storage_location_id: props.storage_Location_id}});
+                context.commit('setEvidences', data);
             } catch (error) {
                 context.commit('setError', getError(error));
             } finally {
                 context.commit('setLoaded', false);
             }
         },
-        async getDivisionsData(context) {
-            try {
-                const {data} = await apiGet('divisions');
-                context.commit('setDivisions', data);
-            } catch (error) {
-                context.commit('setError', getError(error));
-            }
-        },
-        async storeStorageLocationsRow(context, props) {
+        async storeEvidencesRow(context, props) {
             try {
                 context.commit('setLoaded', true);
                 const {data: createdRow} = props;
-                const {data} = await apiPost(`storage-locations`, createdRow);
-                context.commit('addDataRow', {dataKey: 'storageLocations', row: data});
+                const {data} = await apiPost(`evidences`, createdRow);
+                context.commit('addDataRow', {dataKey: 'evidences', row: data});
             } catch (error) {
                 context.commit('setError', getError(error));
             } finally {
                 context.commit('setLoaded', false);
             }
         },
-        async updateStorageLocationsRow(context, props) {
+        async updateEvidencesRow(context, props) {
             try {
                 context.commit('setLoaded', true);
                 const {id, data: updatedRow} = props;
-                const {data} = await apiPatch(`storage-locations/${id}`, updatedRow);
-                context.commit('replaceDataRow', {id, dataKey: 'storageLocations', row: data});
+                const {data} = await apiPatch(`evidences/${id}`, updatedRow);
+                context.commit('replaceDataRow', {id, dataKey: 'evidences', row: data});
             } catch (error) {
                 context.commit('setError', getError(error));
             } finally {
                 context.commit('setLoaded', false);
             }
         },
-        async destroyStorageLocationsRow(context, props) {
+        async destroyEvidencesRow(context, props) {
             try {
                 context.commit('setLoaded', true);
                 const {id} = props;
-                await apiDelete(`storage-locations/${id}`);
-                context.commit('deleteDataRow', {id, dataKey: 'storageLocations'});
+                await apiDelete(`evidences/${id}`);
+                context.commit('deleteDataRow', {id, dataKey: 'evidences'});
             } catch (error) {
                 context.commit('setError', getError(error));
             } finally {

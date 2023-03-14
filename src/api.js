@@ -9,7 +9,7 @@ const HOST = 'http://127.0.0.1:8000/api/';
 
 
 export const apiGet = async (url, data) => {
-    return await axios.get(`${HOST}${url}`, {...config, data});
+    return await axios.get(`${HOST}${url}`, {...config, params: data});
 };
 
 export const apiPost = async (url, data) => {
@@ -21,5 +21,5 @@ export const apiPatch = async (url, data) => {
 };
 
 export const apiDelete = async (url, data) => {
-    return  await axios.delete(`${HOST}${url}`, {...config, data});
+    return  await axios.delete(`${HOST}${url}`, {...config, params: data});
 };

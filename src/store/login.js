@@ -1,6 +1,7 @@
 import {apiPost} from "../api";
 import Auth from "../Auth";
 import router from "../routes";
+import {getError} from "../helpers";
 
 export default {
     state: () => ({
@@ -27,7 +28,7 @@ export default {
                 context.commit('setLoaded', true);
                 await apiPost(`auth/registration`, props);
             } catch (error) {
-                console.log(error);
+                context.commit('setError', getError(error));
             } finally {
                 context.commit('setLoaded', false);
             }
@@ -37,9 +38,9 @@ export default {
                 context.commit('setLoaded', true);
                 const {data} = await apiPost(`auth/login`, props);
                 context.commit('setToken', data)
-            }catch (error) {
-                console.log(error);
-            }finally {
+            } catch (error) {
+                context.commit('setError', getError(error));
+            } finally {
                 context.commit('setLoaded', false);
             }
         },
@@ -48,9 +49,9 @@ export default {
                 context.commit('setLoaded', true);
                 await apiPost(`auth/logout`);
                 context.commit('removeToken')
-            }catch (error) {
-                console.log(error);
-            }finally {
+            } catch (error) {
+                context.commit('setError', getError(error));
+            } finally {
                 context.commit('setLoaded', false);
             }
         },

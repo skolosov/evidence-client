@@ -3,6 +3,7 @@
     <header-component/>
     <v-main style="height: 100vh" class="bg-grey-lighten-3">
       <loader-component/>
+      <error-dialog/>
       <router-view></router-view>
     </v-main>
   </v-app>
@@ -11,10 +12,11 @@
 <script>
 import HeaderComponent from "./components/Header.vue";
 import LoaderComponent from "./components/Loader.vue";
+import ErrorDialog from "./components/ErrorDialog.vue";
 
 export default {
   name: 'App',
-  components: {LoaderComponent, HeaderComponent},
+  components: {ErrorDialog, LoaderComponent, HeaderComponent},
   data: () => ({
     drawer: false,
     group: null,

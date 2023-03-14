@@ -17,7 +17,7 @@ const routes = [
         redirect: Auth.check() ? {name: 'storage'} : null,
     },
     {path: '/storage', component: StorageLocations, name: 'storage', meta: {requiresAuth: true}},
-    {path: '/evidences', component: Evidences, name: 'evi', meta: {requiresAuth: true}},
+    {path: '/evidences/:id', component: Evidences, name: 'evi', meta: {requiresAuth: true}},
     {path: '/login', component: Login, name: 'login', meta: {requiresAuth: false}},
     {path: '/registration', component: Registration, name: 'reg', meta: {requiresAuth: false}},
     {path: '/:pathMatch(.*)*', component: NotFound, name: 'NotFound', meta: {requiresAuth: false}},

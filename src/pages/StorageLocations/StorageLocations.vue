@@ -31,6 +31,7 @@
         <tr
             v-for="item in storageLocationsRows"
             :key="item.id"
+            @dblclick="goToEvidence(item.id)"
         >
           <td>{{ item.id }}</td>
           <td>{{ item.name }}</td>
@@ -168,7 +169,10 @@ export default {
     },
     scrollToEnd() {
       this.$refs.tt.$el.firstElementChild.scrollTop = this.$refs.tt.$el.firstElementChild.scrollHeight;
-    }
+    },
+    goToEvidence(id) {
+      this.$router.push({ name: 'evi', params: { id } });
+    },
   }
 }
 </script>
