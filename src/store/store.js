@@ -1,6 +1,7 @@
-import storageLocation from "./storageLocation";
+import storageLocations from "./storageLocations";
 import login from './login';
-import evidence from './evidence';
+import evidences from './evidences';
+import {mutators, actions} from "./crudHelpers";
 
 const DEFAULT_ERROR = {message: null, status: null};
 
@@ -18,6 +19,7 @@ export default {
         }
     },
     mutations: {
+        ...mutators,
         setLoaded(state, payload) {
             state.loaded = payload;
         },
@@ -27,9 +29,12 @@ export default {
                 : {...DEFAULT_ERROR, ...payload};
         }
     },
+    actions: {
+        ...actions,
+    },
     modules: {
-        storageLocation,
+        storageLocations,
         login,
-        evidence,
+        evidences,
     }
 }

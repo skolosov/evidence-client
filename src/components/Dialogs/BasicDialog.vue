@@ -1,8 +1,7 @@
 <template>
   <v-dialog
-      v-model="isOpenDialog"
+      v-model="dialog"
       width="auto"
-      @update:modelValue="toggleDialog"
   >
     <v-card :class="dialogVariant" min-width="600">
       <v-card-title v-if="title">
@@ -23,7 +22,7 @@
 
 <script>
 export default {
-  name: "Dialog",
+  name: "BasicDialog",
   emits: ['toggle'],
   props: {
     variant: {
@@ -34,28 +33,23 @@ export default {
       type: [String, null],
       default: null,
     },
-    isOpen: {
-      type: Boolean,
-      default: false,
-    }
   },
+  data: () => ({
+    dialog: false,
+  }),
   computed: {
     dialogVariant() {
       switch (this.variant) {
         case 'error':
           return 'bg-red-darken-4';
         default:
-          return 'bg-grey-lighten-4';
+          return 'bg-grey-darken-3';
       }
     },
-    isOpenDialog() {
-      return this.isOpen
-    },
-
   },
   methods: {
     toggleDialog() {
-      this.$emit('toggle', !this.isOpen);
+      this.dialog = !this.dialog;
     }
   }
 }

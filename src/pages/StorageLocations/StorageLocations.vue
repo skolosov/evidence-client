@@ -1,118 +1,79 @@
 <template>
-  <base-table-layout>
+  <table-component :columns="columns" :data="storageLocationsRows">
     <template v-slot:actions>
       <v-btn
-          color="success"
-          @click="toggleDialogCreate"
+          @click="onToggle('createDialog')"
+          color="deep-orange-accent-2"
+          prepend-icon="mdi-plus"
       >
-        Создать место хранения
+        Создать
       </v-btn>
     </template>
-    <template v-slot:table>
-      <v-alert v-if="!storageLocationsRows.length" class="text-black">
-        <span>Нет данных</span>
-      </v-alert>
-      <v-table
-          v-else
-          ref="tt"
-          class="v-table--density-comfortable border"
-          hover
-          fixed-header
-          height="800px"
-      >
-        <thead>
-        <tr>
-          <th v-for="column in columns" class="text-center bg-grey-darken-3">
-            {{ column }}
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr
-            v-for="item in storageLocationsRows"
-            :key="item.id"
-            @dblclick="goToEvidence(item.id)"
-        >
-          <td>{{ item.id }}</td>
-          <td>{{ item.name }}</td>
-          <td></td>
-          <td class="text-center">
-            <v-btn
-                variant="outlined"
-                size="small"
-                icon="mdi-text-box-edit-outline"
-                color="success"
-                @click="toggleDialogEdit(item)"
-            />
-          </td>
-          <td class="text-center">
-            <v-btn
-                variant="outlined"
-                size="small"
-                icon="mdi-delete"
-                color="error"
-                @click="toggleDialogDelete(item)"
-            />
-          </td>
-        </tr>
-        </tbody>
-      </v-table>
+    <template v-slot:item-edit="row">
+      <ThreeDotBtn
+          @changeList="(list) => onChange(list, row)"
+          :options="threeDotOptions"
+      />
     </template>
-  </base-table-layout>
-
-  <dialog-component
-      title="Создать место хранения"
-      :is-open="isOpenDialogCreate"
-      @toggle="toggleDialogCreate"
-  >
-    <template v-slot:content>
-      <storage-locations-form @form-sub="storeStorageLocations" @close="toggleDialogCreate"/>
+    <template v-slot:item-open="{props}">
+      <v-btn @click="goToEvidence(props)">Открыть</v-btn>
     </template>
-  </dialog-component>
-  <dialog-component
-      title="Изменение места хранения"
-      :is-open="isOpenDialogEdit"
-      @toggle="toggleDialogEdit"
-  >
+  </table-component>
+  <basic-dialog ref="createDialog" title="Добавить">
     <template v-slot:content>
-      <storage-locations-form :active="activeRow" @form-sub="updateStorageLocation" @close="toggleDialogEdit"/>
+      <storage-locations-form
+          :active="activeRow"
+          @close="onClose('createDialog')"
+          @form-sub="createStorageLocation"
+      />
     </template>
-  </dialog-component>
-  <dialog-component
-      title="Изменение места хранения"
-      :is-open="isOpenDialogEdit"
-      @toggle="toggleDialogEdit"
-  >
+  </basic-dialog>
+  <basic-dialog ref="editDialog" title="Редактировать">
     <template v-slot:content>
-      <storage-locations-form :active="activeRow" @form-sub="updateStorageLocation" @close="toggleDialogEdit"/>
+      <storage-locations-form
+          :active="activeRow"
+          @close="onClose('editDialog')"
+          @form-sub="updateStorageLocation"
+      />
     </template>
-  </dialog-component>
-  <dialog-component
-      title="Удалить место хранения"
-      :is-open="isOpenDialogDelete"
-      variant="error"
-      @toggle="toggleDialogDelete"
-  >
+  </basic-dialog>
+  <basic-dialog variant="error" ref="deleteDialog" title="Удалить">
     <template v-slot:content>
-      <span>Вы точно хотите место хранения?</span>
+      <span>Вы точно хотите удалить вещественное доказательство?</span>
     </template>
     <template v-slot:actions>
       <v-btn variant="elevated" @click="destroyStorageLocation" color="error">Удалить</v-btn>
-      <v-btn variant="elevated" @click="toggleDialogDelete">Отмена</v-btn>
+      <v-btn variant="elevated" @click="onClose('deleteDialog')">Отмена</v-btn>
     </template>
-  </dialog-component>
+  </basic-dialog>
 </template>
 
 <script>
-import DialogComponent from "../../components/Dialog.vue";
 import StorageLocationsForm from "./StorageLocationsForm.vue";
 import {mapActions, mapGetters} from 'vuex';
+import DialogComponent from "../../components/Dialog.vue";
 import LoaderComponent from "../../components/Loader.vue";
 import BaseTableLayout from "../Layouts/BaseTableLayout.vue";
+import ThreeDotBtn from "../../components/ThreeDotBtn.vue";
+import ActionsMenu from "../../components/ActionsMenu.vue";
+import BasicDialog from "../../components/Dialogs/BasicDialog.vue";
+import TableComponent from "../../components/TableComponent.vue";
+import {DIVISIONS_REQUEST, STORAGE_LOCATIONS_REQUEST} from "../../store/baseRequest";
+
+
 
 export default {
   name: "StorageLocations",
-  components: {BaseTableLayout, LoaderComponent, StorageLocationsForm, DialogComponent},
+  components: {
+    BaseTableLayout,
+    LoaderComponent,
+    StorageLocationsForm,
+    DialogComponent,
+    ThreeDotBtn,
+    ActionsMenu,
+    BasicDialog,
+    TableComponent,
+  },
   data() {
     return {
       isOpenDialogEdit: false,
@@ -120,59 +81,113 @@ export default {
       isOpenDialogCreate: false,
       activeRow: null,
       columns: [
-        '№ п\\п',
-        'Наименование',
-        'Кол-во хранимых вещественных доказательств',
-        'Редактировать',
-        'Удалить'
+        {value: 'id', text: '№ п\\п', direction: 'center', sortable: true, width: 30},
+        {value: 'name', text: 'Наименование', sortable: true},
+        {value: 'qty', text: 'Кол-во хранимых вещественных доказательств'},
+        {value: 'edit', text: 'Действие', direction: 'center', width: 30},
+        {value: 'open', text: 'ВД', direction: 'center', width: 30},
       ],
+      threeDotOptions: [
+        {label: 'Изменить', name: 'edit', icon: 'mdi-text-box-edit-outline'},
+        {label: 'Удалить', name: 'delete', icon: 'mdi-delete'},
+      ]
     }
   },
   computed: {
     ...mapGetters(['storageLocationsRows']),
   },
-  mounted() {
-    !this.storageLocationsRows.length && this.getStorageLocationsData();
-    this.getDivisionsData();
+  beforeMount() {
+    this.index(STORAGE_LOCATIONS_REQUEST);
+    this.index(DIVISIONS_REQUEST);
   },
   methods: {
     ...mapActions([
-      'getStorageLocationsData',
-      'getDivisionsData',
-      'updateStorageLocationsRow',
-      'destroyStorageLocationsRow',
-      'storeStorageLocationsRow',
+      'index',
+      'store',
+      'update',
+      'destroy',
     ]),
-    toggleDialogEdit(active) {
-      this.activeRow = active;
-      this.isOpenDialogEdit = !this.isOpenDialogEdit;
+    // ...mapActions([
+    //   'getStorageLocationsData',
+    //   'getDivisionsData',
+    //   'updateStorageLocationsRow',
+    //   'destroyStorageLocationsRow',
+    //   'storeStorageLocationsRow',
+    // ]),
+    onChange({name}, {props}) {
+      this.activeRow = props;
+      switch (name) {
+        case 'edit':
+          this.onToggle('editDialog');
+          break;
+        case 'delete':
+          this.onToggle('deleteDialog');
+          break;
+      }
     },
-    toggleDialogDelete(active) {
-      this.activeRow = active;
-      this.isOpenDialogDelete = !this.isOpenDialogDelete;
+    onToggle(dialog) {
+      this.$refs?.[dialog]?.toggleDialog();
     },
-    toggleDialogCreate() {
-      this.isOpenDialogCreate = !this.isOpenDialogCreate;
+    onClose(dialog) {
+      this.activeRow = null;
+      this.onToggle(dialog)
     },
-    async storeStorageLocations(props) {
-      await this.storeStorageLocationsRow({data: props});
-      this.isOpenDialogCreate = false;
-      this.scrollToEnd();
+    createStorageLocation(props) {
+      this.store({
+        ...STORAGE_LOCATIONS_REQUEST,
+        props,
+      });
+      this.onToggle('createDialog');
     },
     updateStorageLocation(props) {
-      this.updateStorageLocationsRow({id: this.activeRow.id, data: props});
-      this.isOpenDialogEdit = false;
+      this.update({
+        ...STORAGE_LOCATIONS_REQUEST,
+        props,
+        id: this.activeRow.id,
+      })
+      this.onToggle('editDialog');
     },
     destroyStorageLocation() {
-      this.destroyStorageLocationsRow({id: this.activeRow.id});
-      this.isOpenDialogDelete = false;
+      this.destroy({
+        ...STORAGE_LOCATIONS_REQUEST,
+        id: this.activeRow.id,
+      });
+      this.onToggle('deleteDialog');
     },
-    scrollToEnd() {
-      this.$refs.tt.$el.firstElementChild.scrollTop = this.$refs.tt.$el.firstElementChild.scrollHeight;
+    onSubmit(props) {
+      this.onToggle();
     },
-    goToEvidence(id) {
-      this.$router.push({ name: 'evi', params: { id } });
+    goToEvidence(props) {
+      console.log(props)
+      this.$router.push({ name: 'evi', params: { id: props.id } });
     },
+    // toggleDialogEdit(active) {
+    //   this.activeRow = active;
+    //   this.isOpenDialogEdit = !this.isOpenDialogEdit;
+    // },
+    // toggleDialogDelete(active) {
+    //   this.activeRow = active;
+    //   this.isOpenDialogDelete = !this.isOpenDialogDelete;
+    // },
+    // toggleDialogCreate() {
+    //   this.isOpenDialogCreate = !this.isOpenDialogCreate;
+    // },
+    // async storeStorageLocations(props) {
+    //   await this.storeStorageLocationsRow({data: props});
+    //   this.isOpenDialogCreate = false;
+    //   this.scrollToEnd();
+    // },
+    // updateStorageLocation(props) {
+    //   this.updateStorageLocationsRow({id: this.activeRow.id, data: props});
+    //   this.isOpenDialogEdit = false;
+    // },
+    // destroyStorageLocation() {
+    //   this.destroyStorageLocationsRow({id: this.activeRow.id});
+    //   this.isOpenDialogDelete = false;
+    // },
+    // scrollToEnd() {
+    //   this.$refs.tt.$el.firstElementChild.scrollTop = this.$refs.tt.$el.firstElementChild.scrollHeight;
+    // },
   }
 }
 </script>
